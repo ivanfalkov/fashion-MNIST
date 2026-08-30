@@ -1,4 +1,4 @@
-1. # Описание задачи
+# 1.Описание задачи
 Решаю задачу многоклассовой классификации с 10 классами. Данные fashion-MNIST картинки размером 28x28 пикселей с одним серым каналом, таргеты от 0 до 9, число отражает название одежды для соотвествующего класса. 
 
 По результатам EDA - классы распределены равномерно.  
@@ -9,7 +9,7 @@ ALEXNET,
 RESNET, RESNET TUNNED,   
 TRANSFORMER SWIN, TRANSFORMER SWIN FINETUNNED.    
 
-2. # Выводы эксперимента:  
+# 2.Выводы эксперимента:  
 1. Использования сверточных сетей для CV задачи и этого датасета дало прирост по точности 3.5% с 88.77% до 92.32%.
 2. Каждое зменение гиперпараметров нейроситей давали хоть и небольшой но прирост. В одном случае с 91.31% до 92.32%, в другом 87.93% до 88.77%. Да улучшение незначитальные, но они были подобраны в ручную, думаю при помощи более продвинутых методов подробора можно было бы получить больший прирост.
 3. Трансформер отработал хуже, чем более старый RESNET, даже файнтюнинг с инизиализацией весов не повысил качество. Говорит о том, что под конкретную задачу важна более детальная настройка модели и её архитектуры, а не просто взять самую новую модель. 
@@ -26,7 +26,7 @@ TRANSFORMER SWIN, TRANSFORMER SWIN FINETUNNED.
 | Swin Transformer Finetuned | 95.37% | 90.87% |
 | Tuned MLP | 93.14% | 88.77% |
 | Simple MLP | 91.05% | 87.93% |
-3. DEPENDENCIES
+# 3. DEPENDENCIES
 ## Installation
 
 ### Requirements
@@ -99,10 +99,15 @@ The main project dependencies include:
 
 * `numpy` — numerical computations
 * `pandas` — data manipulation
-* `matplotlib` — visualization
-* `seaborn` — statistical visualization
+* `matplotlib` — data visualization
+* `seaborn` — statistical data visualization
 * `torch` — deep learning framework
 * `torchvision` — computer vision datasets and transformations
+* `pyyaml` — parsing and working with YAML configuration files
+* `click` — creating command-line interfaces (CLI) and handling command-line arguments
+
+Development dependencies include:
+
 
 Development dependencies include:
 

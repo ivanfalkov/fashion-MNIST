@@ -1,0 +1,75 @@
+```python
+from pathlib import Path
+
+import click
+import torch
+import yaml
+from torch.utils.data import DataLoader
+
+
+def get_device() -> torch.device:
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+
+    return torch.device("cpu")
+
+
+def load_dataset(path: Path):
+    return torch.load(path, weights_only=False)
+
+
+@click.command()
+@click.option("--config", required=True, type=click.Path(exists=True))
+@click.option("--data-config", required=True, type=click.Path(exists=True))
+def main(config: str, data_config: str) -> None:
+    with open(config, "r", encoding="utf-8") as file:
+        config = yaml.safe_load(file)
+
+    with open(data_config, "r", encoding="utf-8") as file:
+        data_config = yaml.safe_load(file)
+
+    device = get_device()
+    click.echo(f"Using device: {device}")
+
+    processed_dir = Path(data_config["data"]["processed_dir"])
+
+    train_dataset = load_dataset(processed_dir / "train.pt")
+    val_dataset = load_dataset(processed_dir / "val.pt")
+    test_dataset = load_dataset(processed_dir / "test.pt")
+
+    batch_size = config["training"]["batch_size"]
+
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+    )
+
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+    )
+
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+    )
+
+    # Model
+    # model = ...
+
+    # Loss
+    # criterion = ...
+
+    # Optimizer
+    # optimizer = ...
+
+    # Training loop
+    # ...
+
+
+if __name__ == "__main__":
+    main()
+```
