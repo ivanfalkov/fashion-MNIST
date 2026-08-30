@@ -1,0 +1,27 @@
+seed: 42
+
+data:
+  raw_dir: src/data/raw
+  processed_dir: src/data/processed
+  seed: 42
+  train_ratio: 0.9
+
+  train:
+    split: 0.9
+
+  test: true
+
+dataloader:
+  batch_size: 128
+
+  train:
+    shuffle: true
+    drop_last: true
+
+  validation:
+    shuffle: false
+    drop_last: false
+
+  test:
+    shuffle: false
+    drop_last: false
