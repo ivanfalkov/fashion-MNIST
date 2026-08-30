@@ -5,6 +5,22 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "torch>=2.13.0",
-    "torchvision>=0.28.0",
+    "matplotlib>=3.11.1",
+    "seaborn>=0.13.2",
+    "torch>=2.11.0",
+    "torchvision>=0.26.0",
 ]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.3.0",
+    "torchinfo>=1.8.0",
+]
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu128"
+
+[tool.uv.sources]
+torch = { index = "pytorch" }
+torchvision = { index = "pytorch" }
