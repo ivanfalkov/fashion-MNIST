@@ -26,11 +26,8 @@ TRANSFORMER SWIN, TRANSFORMER SWIN FINETUNNED.
 | Swin Transformer Finetuned | 95.37% | 90.87% |
 | Tuned MLP | 93.14% | 88.77% |
 | Simple MLP | 91.05% | 87.93% |
-# 3. DEPENDENCIES
-## Installation
-
-### Requirements
-
+# 3. Development Setup
+## Installation, Requirements and Start pipeline 
 * Python 3.12
 * [uv](https://docs.astral.sh/uv/)
 
@@ -121,7 +118,7 @@ fashion-MNIST/
 ├── pyproject.toml        # Project configuration and dependencies
 ├── uv.lock               # Locked dependency versions
 └── README.md
-
+```
 ### 8. Pipeline
 
 The project is organized into three main scripts:
