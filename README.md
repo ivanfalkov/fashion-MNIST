@@ -117,7 +117,7 @@ fashion-MNIST/
 ├── pyproject.toml        # Project configuration and dependencies
 ├── uv.lock               # Locked dependency versions
 └── README.md
-### 8. ## Dependencies
+### 8. Dependencies
 
 The main project dependencies include:
 
