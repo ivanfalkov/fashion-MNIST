@@ -9,7 +9,12 @@ from torchvision.transforms import v2
 
 
 @click.command()
-@click.option("--config", required=True, type=click.Path(exists=True))
+@click.option(
+    "--config", 
+    default="configs/model_config.yaml", 
+    help="Path to model config",
+    type=click.Path(exists=True),
+)
 def main(config: str) -> None:
     with open(config, "r", encoding="utf-8") as file:
         config = yaml.safe_load(file)

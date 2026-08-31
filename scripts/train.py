@@ -154,11 +154,13 @@ def train(model, train_loader, val_loader, config, device):
     "--config",
     default="configs/model_config.yaml",
     help="Path to model config",
+    type=click.Path(exists=True),
 )
 @click.option(
     "--data-config",
     default="configs/data_config.yaml",
     help="Path to data config",
+    type=click.Path(exists=True),
 )
 def main(config, data_config):
     model_config = load_config(config)

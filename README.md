@@ -121,9 +121,46 @@ fashion-MNIST/
 ├── pyproject.toml        # Project configuration and dependencies
 ├── uv.lock               # Locked dependency versions
 └── README.md
+
+### 8. Pipeline
+
+The project is organized into three main scripts:
+
+1. Prepare data
+
+```bash
+uv run python scripts/data.py --config configs/data_config.yaml
 ```
 
-### 8. Dependencies
+Downloads the Fashion-MNIST dataset, creates train/validation splits, and saves the processed datasets to `src/data/processed`.
+
+2. Train model
+
+```bash
+uv run python scripts/train.py
+```
+
+Loads the processed train and validation datasets, builds and trains the configured model, applies early stopping, and saves the best model to the checkpoint path specified in `model_config.yaml`.
+
+3. Evaluate model
+
+```bash
+uv run python scripts/evaluate.py
+```
+
+Loads the trained model from the checkpoint specified in `model_config.yaml`, calculates accuracy on the train, validation, and test datasets, and saves the results to `src/metrics/metrics.csv`.
+
+Full pipeline
+
+Run the scripts in the following order:
+
+```bash
+uv run python scripts/data.py --config configs/data_config.yaml
+uv run python scripts/train.py
+uv run python scripts/evaluate.py
+```
+
+### 9. Dependencies
 
 The main project dependencies include:
 
