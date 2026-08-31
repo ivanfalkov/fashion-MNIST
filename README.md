@@ -107,16 +107,22 @@ Automatically fix supported linting issues:
 uv run ruff check . --fix
 
 ### 7. Project Structure
+
+```text
 fashion-MNIST/
 ├── configs/              # YAML configuration files
 ├── notebooks/            # Jupyter notebooks
 ├── scripts/              # Project scripts
 ├── src/
-│   └── data/             # Dataset files
+│   └── data/             # Dataset files   
+│   └── metrics/          # Metrics file
+│   └── checkpoints/      # Models 
 ├── .gitignore
 ├── pyproject.toml        # Project configuration and dependencies
 ├── uv.lock               # Locked dependency versions
 └── README.md
+```
+
 ### 8. Dependencies
 
 The main project dependencies include:
