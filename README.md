@@ -92,26 +92,46 @@ The path should point to:
 ```text
 .../fashion-MNIST/.venv/...
 ```
+### 6. Code Formatting and Linting
 
-### 6. Dependencies
+Format the project with Ruff:
+
+uv run ruff format .
+
+Check the code for linting issues:
+
+uv run ruff check .
+
+Automatically fix supported linting issues:
+
+uv run ruff check . --fix
+
+### 7. Project Structure
+fashion-MNIST/
+├── configs/              # YAML configuration files
+├── notebooks/            # Jupyter notebooks
+├── scripts/              # Project scripts
+├── src/
+│   └── data/             # Dataset files
+├── .gitignore
+├── pyproject.toml        # Project configuration and dependencies
+├── uv.lock               # Locked dependency versions
+└── README.md
+### 8. ## Dependencies
 
 The main project dependencies include:
 
-* `numpy` — numerical computations
-* `pandas` — data manipulation
-* `matplotlib` — data visualization
-* `seaborn` — statistical data visualization
 * `torch` — deep learning framework
 * `torchvision` — computer vision datasets and transformations
+* `matplotlib` — data visualization
+* `seaborn` — statistical data visualization
 * `pyyaml` — parsing and working with YAML configuration files
 * `click` — creating command-line interfaces (CLI) and handling command-line arguments
 
 Development dependencies include:
 
-
-Development dependencies include:
-
-* `ipykernel` — Jupyter Notebook kernel
-
+* `ipykernel` — Jupyter Notebook kernel for working with `.ipynb` files in Cursor
+* `ruff` — linting and code formatting
+* `torchinfo` — displaying model architecture and parameter information
 
 All dependencies are specified in `pyproject.toml` and locked in `uv.lock`.

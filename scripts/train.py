@@ -19,15 +19,14 @@ def load_dataset(path: Path):
 
 
 def create_dataloaders(config):
-    data_config = config["data"]
+    config = config
 
-    processed_dir = Path(data_config["data"]["processed_dir"])
+    processed_dir = Path(config["data"]["processed_dir"])
 
     train_dataset = load_dataset(processed_dir / "train.pt")
     val_dataset = load_dataset(processed_dir / "val.pt")
-    test_dataset = load_dataset(processed_dir / "test.pt")
 
-    batch_size = config["training"]["batch_size"]
+    batch_size = config["dataloader"]["batch_size"]
 
     train_loader = DataLoader(
         train_dataset,
@@ -91,9 +90,6 @@ def train(model, train_loader, val_loader, config, device):
     counter = 0
 
     for epoch in range(training_config["epochs"]):
-        # =====================
-        # Training
-        # =====================
         model.train()
 
         train_loss = 0.0
@@ -113,9 +109,6 @@ def train(model, train_loader, val_loader, config, device):
 
         train_loss /= len(train_loader)
 
-        # =====================
-        # Validation
-        # =====================
         model.eval()
 
         val_loss = 0.0
@@ -138,16 +131,11 @@ def train(model, train_loader, val_loader, config, device):
             f"val_loss - {val_loss:.4f}"
         )
 
-        # =====================
-        # Early stopping
-        # =====================
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             counter = 0
 
-            best_model_state = copy.deepcopy(
-                model.state_dict()
-            )
+            best_model_state = copy.deepcopy(model.state_dict())
 
         else:
             counter += 1
@@ -185,9 +173,7 @@ def main(config, data_config):
 
     print(f"Using device: {device}")
 
-    train_loader, val_loader = create_dataloaders(
-        data_config
-    )
+    train_loader, val_loader = create_dataloaders(data_config)
 
     model = build_model(model_config)
     model = model.to(device)
@@ -200,13 +186,12 @@ def main(config, data_config):
         device=device,
     )
 
-    checkpoint_path = model_config["training"]["checkpoint_path"]
+    checkpoint_path = Path(model_config["training"]["checkpoint_path"])
+
+    checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
 
     torch.save(
-        {
-            "model_state_dict": model.state_dict(),
-            "best_val_loss": best_val_loss,
-        },
+        model,
         checkpoint_path,
     )
 

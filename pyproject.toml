@@ -16,6 +16,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "ipykernel>=7.3.0",
+    "ruff>=0.16.5",
     "torchinfo>=1.8.0",
 ]
 
@@ -26,3 +27,12 @@ url = "https://download.pytorch.org/whl/cu128"
 [tool.uv.sources]
 torch = { index = "pytorch" }
 torchvision = { index = "pytorch" }
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.format]
+quote-style = "double"

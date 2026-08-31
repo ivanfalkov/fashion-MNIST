@@ -1,7 +1,7 @@
 device: cuda
 
 model:
-  name: resnet18
+  name: custom_resnet18
   weights: null
 
   input_channels: 1
@@ -35,3 +35,5 @@ training:
   early_stopping:
     enabled: true
     patience: 7
+  
+  checkpoint_path: src/checkpoints/model.pt

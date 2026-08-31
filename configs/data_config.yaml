@@ -25,3 +25,6 @@ dataloader:
   test:
     shuffle: false
     drop_last: false
+
+metrics:
+  metrics_path: src/metrics/metrics.csv

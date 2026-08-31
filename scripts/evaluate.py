@@ -1,106 +1,59 @@
+from datetime import datetime
+from pathlib import Path
+
 import click
+import pandas as pd
 import torch
 import yaml
-from torch.utils.data import DataLoader, random_split
-from torchvision import datasets
-from torchvision.models import resnet18
-from torchvision.transforms import v2
-import torch.nn as nn
+from torch.utils.data import DataLoader
 
 
 def load_config(path):
-    with open(path, "r") as file:
+    with open(path, "r", encoding="utf-8") as file:
         return yaml.safe_load(file)
 
 
-def create_dataloaders(config):
-    dataset_config = config["dataset"]
-    dataloader_config = config["dataloader"]
+def load_dataset(path: Path):
+    return torch.load(path, weights_only=False)
 
-    transform = v2.Compose([
-        v2.ToImage(),
-        v2.ToDtype(torch.float32, scale=True),
-    ])
 
-    train_dataset = datasets.FashionMNIST(
-        root=dataset_config["root"],
-        train=True,
-        download=dataset_config["download"],
-        transform=transform,
-    )
+def build_dataloaders(config):
+    processed_dir = Path(config["data"]["processed_dir"])
+    batch_size = config["dataloader"]["batch_size"]
 
-    train_size = int(
-        len(train_dataset) * dataset_config["train"]["split"]
-    )
-    val_size = len(train_dataset) - train_size
-
-    train_dataset, _ = random_split(
-        train_dataset,
-        [train_size, val_size],
-        generator=torch.Generator().manual_seed(config["seed"]),
-    )
-
-    test_dataset = datasets.FashionMNIST(
-        root=dataset_config["root"],
-        train=False,
-        download=dataset_config["download"],
-        transform=transform,
-    )
+    train_dataset = load_dataset(processed_dir / "train.pt")
+    val_dataset = load_dataset(processed_dir / "val.pt")
+    test_dataset = load_dataset(processed_dir / "test.pt")
 
     train_loader = DataLoader(
         train_dataset,
-        batch_size=dataloader_config["batch_size"],
+        batch_size=batch_size,
         shuffle=False,
-        drop_last=False,
+    )
+
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=batch_size,
+        shuffle=False,
     )
 
     test_loader = DataLoader(
         test_dataset,
-        batch_size=dataloader_config["batch_size"],
+        batch_size=batch_size,
         shuffle=False,
-        drop_last=False,
     )
 
-    return train_loader, test_loader
+    return train_loader, val_loader, test_loader
 
 
-def build_model(config):
-    model_config = config["model"]
-
-    model = resnet18(
-        weights=model_config["weights"],
-    )
-
-    model.conv1 = nn.Conv2d(
-        in_channels=model_config["input_channels"],
-        out_channels=model_config["conv1"]["out_channels"],
-        kernel_size=model_config["conv1"]["kernel_size"],
-        stride=model_config["conv1"]["stride"],
-        padding=model_config["conv1"]["padding"],
-        bias=model_config["conv1"]["bias"],
-    )
-
-    model.maxpool = nn.Identity()
-
-    model.fc = nn.Sequential(
-        nn.Dropout(model_config["dropout"]),
-        nn.Linear(
-            model.fc.in_features,
-            model_config["num_classes"],
-        ),
-    )
-
-    return model
-
-
-def evaluate(model, loader, device):
+def evaluate(model, data_loader, device):
     model.eval()
 
     correct = 0
     total = 0
 
     with torch.no_grad():
-        for x_batch, y_batch in loader:
+        for x_batch, y_batch in data_loader:
             x_batch = x_batch.to(device)
             y_batch = y_batch.to(device)
 
@@ -111,6 +64,44 @@ def evaluate(model, loader, device):
             total += y_batch.size(0)
 
     return correct / total
+
+
+def save_metrics(
+    model_name,
+    train_accuracy,
+    val_accuracy,
+    test_accuracy,
+    metrics_path,
+):
+    metrics_path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    result = pd.DataFrame(
+        [
+            {
+                "model": model_name,
+                "train_accuracy": train_accuracy,
+                "val_accuracy": val_accuracy,
+                "test_accuracy": test_accuracy,
+                "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            }
+        ]
+    )
+
+    if metrics_path.exists():
+        result.to_csv(
+            metrics_path,
+            mode="a",
+            header=False,
+            index=False,
+        )
+    else:
+        result.to_csv(
+            metrics_path,
+            index=False,
+        )
 
 
 @click.command()
@@ -137,24 +128,25 @@ def main(config, data_config):
 
     print(f"Using device: {device}")
 
-    train_loader, test_loader = create_dataloaders(
-        data_config
-    )
-
-    model = build_model(model_config)
-
-    checkpoint = torch.load(
-        model_config["training"]["checkpoint_path"],
+    train_loader, val_loader, test_loader = build_dataloaders(data_config)
+    checkpoint_path = Path(model_config["training"]["checkpoint_path"])
+    model = torch.load(
+        checkpoint_path,
         map_location=device,
-        weights_only=True,
+        weights_only=False,
     )
 
-    model.load_state_dict(checkpoint["model_state_dict"])
     model = model.to(device)
 
     train_accuracy = evaluate(
         model,
         train_loader,
+        device,
+    )
+
+    val_accuracy = evaluate(
+        model,
+        val_loader,
         device,
     )
 
@@ -164,8 +156,23 @@ def main(config, data_config):
         device,
     )
 
-    print(f"Accuracy train: {train_accuracy:.4f}")
-    print(f"Accuracy test: {test_accuracy:.4f}")
+    print(f"Train accuracy: {train_accuracy:.4f}")
+    print(f"Val accuracy:   {val_accuracy:.4f}")
+    print(f"Test accuracy:  {test_accuracy:.4f}")
+
+    metrics_path = Path(data_config["metrics"]["metrics_path"])
+
+    metrics_path.parent.mkdir(parents=True, exist_ok=True)
+
+    save_metrics(
+        model_name=model_config["model"]["name"],
+        train_accuracy=train_accuracy,
+        val_accuracy=val_accuracy,
+        test_accuracy=test_accuracy,
+        metrics_path=metrics_path,
+    )
+
+    print(f"Metrics saved to: {metrics_path}")
 
 
 if __name__ == "__main__":
